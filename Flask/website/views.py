@@ -48,6 +48,32 @@ def inventory():
     bikes = Bike.query.filter_by().all()  # Fetch only the current user's bikes
     current_date = datetime.utcnow().date()
     return render_template("inventory.html", user=current_user, bikes=bikes)
+    
+@views.route('/info')
+@login_required
+def info():
+    bikes = Bike.query.filter_by(user_id=current_user.id).filter(Bike.out_of_commission == False).all()
+    current_date = datetime.now(timezone.utc).date()
+    
+    location_summary = {}
+    for bike in bikes:
+        location = bike.location
+        if location not in location_summary:
+            location_summary[location] = {'total': 0, 'types': {}, 'entered_today': 0, 'not_entered_today': 0}
+        
+        location_summary[location]['total'] += 1
+        bike_type = bike.type
+        if bike_type not in location_summary[location]['types']:
+            location_summary[location]['types'][bike_type] = 0
+        location_summary[location]['types'][bike_type] += 1
+
+        if bike.date_entered.date() == current_date:
+            location_summary[location]['entered_today'] += 1
+        else:
+            location_summary[location]['not_entered_today'] += 1
+    
+    return render_template("info.html", user=current_user, location_summary=location_summary)
+
 
 @views.route('/delete-bike', methods=['POST'])
 @login_required
