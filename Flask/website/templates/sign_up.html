@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<form method="POST">
+    <div class="container mt-5">
+        <div class="background-image" style="background-image: url('https://img.freepik.com/free-photo/vivid-blurred-colorful-wallpaper-background_58702-3798.jpg'); height: 100vh; background-size: cover; background-position: center; position: absolute; width: 100%; top: 0; left: 0; z-index: -1;"></div>
+        <h3 align="center">Sign Up</h3>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+        </div>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
+        </div>
+        <div class="form-group">
+            <label for="password1">Password</label>
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter password" required>
+        </div>
+        <div class="form-group">
+            <label for="password2">Password (Confirm)</label>
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm password" required>
+        </div>
+        <div class="form-group">
+            <label for="secretCode">Admin Code</label>
+            <input type="text" class="form-control" id="secretCode" name="secretCode" placeholder="Enter admin code" required>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+{% endblock %}
