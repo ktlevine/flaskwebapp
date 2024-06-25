@@ -12,7 +12,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'OutsideBrandsSecretKey1234'
     db_path = path.join(path.abspath('website'), DB_NAME)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://udjdpu6brkaejf:pc75ffc600d0fc0c2312e18f6720c6db58a69a359b750d1d34fcbf3ce8b9d337b@c5hilnj7pn10vb.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dapgtn38oqjiq0'
     db.init_app(app)
     migrate.init_app(app, db)
 
