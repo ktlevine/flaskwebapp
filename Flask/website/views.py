@@ -52,7 +52,7 @@ def inventory():
 @views.route('/info')
 @login_required
 def info():
-    bikes = Bike.query.filter_by(user_id=current_user.id).filter(Bike.out_of_commission == False).all()
+    bikes = Bike.query.filter_by(Bike.out_of_commission == False).all()
     current_date = datetime.now(timezone.utc).date()
     
     location_summary = {}
@@ -72,8 +72,7 @@ def info():
         else:
             location_summary[location]['not_entered_today'] += 1
     
-    return render_template("info.html", user=current_user, location_summary=location_summary)
-
+    return render_template("info.html", location_summary=location_summary)
 
 @views.route('/delete-bike', methods=['POST'])
 @login_required
