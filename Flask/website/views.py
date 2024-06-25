@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_file
 from flask_login import login_required, current_user
 from .models import Bike
-from datetime import datetime
+from datetime import datetime, timezone
 from . import db
 import json
 import pandas as pd
@@ -46,9 +46,9 @@ def home():
 @login_required
 def inventory():
     bikes = Bike.query.filter_by().all()  # Fetch only the current user's bikes
-    current_date = datetime.utcnow().date()
+    current_date = datetime.now(timezone.utc).date()
     return render_template("inventory.html", user=current_user, bikes=bikes)
-    
+
 @views.route('/info')
 @login_required
 def info():
