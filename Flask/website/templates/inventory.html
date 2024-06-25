@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <title>Manage</title>
+    <style>
+        .out-of-commission {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .out-of-commission .btn-warning {
+            display: none;
+        }
+        .out-of-commission .btn-danger {
+            margin-right: 10px;
+        }
+        .date-entered-today {
+            color: green;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5), 0 0 10px rgba(0, 255, 0, 0.4), 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        .date-entered-wrong {
+            color: red;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5), 0 0 10px rgba(255, 0, 0, 0.4), 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="button-row">
+        <button class="btn btn-secondary" onclick="history.back()">Back</button>
+        <a href="{{ url_for('views.export') }}" class="btn btn-success">Export to Excel</a>
+    </div>
+    <h1>Manage</h1>
+
+    <!-- Search and Filter Bar -->
+    <input class="form-control mb-3" id="searchBar" type="text" placeholder="Search by number, type, or location..." onkeyup="searchBikes()">
+
+    <ul class="list-group list-group-flush" id="bikes">
+        {% for bike in bikes %}
+        <li class="list-group-item {% if bike.out_of_commission %}out-of-commission{% endif %}">
+            <p>Number: {{ bike.number }}</p>
+            <p>Type: {{ bike.type }}</p>
+            <p>Location: {{ bike.location }}</p>
+            <p>Needs Maintenance: {{ 'Yes' if bike.needs_maintenance else 'No' }}</p>
+            <p>Out of Commission: {{ 'Yes' if bike.out_of_commission else 'No' }}</p>
+            <p class="date-entered {% if bike.date_entered.date() != current_date %}date-entered-wrong{% else %}date-entered-today{% endif %}" data-date="{{ bike.date_entered.date() }}">Date Entered: {{ bike.date_entered.date() }}</p>
+            <button class="btn btn-danger" onclick="deleteBike('{{ bike.id }}')">Delete</button>
+            <button class="btn btn-warning" onclick="markOutOfCommission('{{ bike.id }}')">Mark Out of Commission</button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+    function deleteBike(bikeId) {
+        fetch("/delete-bike", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ bikeId: bikeId }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(() => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    function markOutOfCommission(bikeId) {
+        fetch("/mark-out-of-commission", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ bikeId: bikeId }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(() => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    function searchBikes() {
+        const searchBar = document.getElementById('searchBar');
+        const filter = searchBar.value.toLowerCase();
+        const bikesList = document.getElementById('bikes');
+        const bikes = bikesList.getElementsByTagName('li');
+
+        for (let i = 0; i < bikes.length; i++) {
+            const bikeNumber = bikes[i].getElementsByTagName('p')[0].textContent.toLowerCase();
+            const bikeType = bikes[i].getElementsByTagName('p')[1].textContent.toLowerCase();
+            const bikeLocation = bikes[i].getElementsByTagName('p')[2].textContent.toLowerCase();
+            if (bikeNumber.indexOf(filter) > -1 || bikeType.indexOf(filter) > -1 || bikeLocation.indexOf(filter) > -1) {
+                bikes[i].style.display = "";
+            } else {
+                bikes[i].style.display = "none";
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const today = new Date().toISOString().split('T')[0];
+        const dateElements = document.querySelectorAll('.date-entered');
+
+        dateElements.forEach(el => {
+            const dateEntered = el.dataset.date;
+            if (dateEntered === today) {
+                el.classList.add('date-entered-today');
+                el.classList.remove('date-entered-wrong');
+            } else {
+                el.classList.add('date-entered-wrong');
+                el.classList.remove('date-entered-today');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
