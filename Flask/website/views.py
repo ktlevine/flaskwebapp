@@ -45,14 +45,14 @@ def home():
 @views.route('/inventory')
 @login_required
 def inventory():
-    bikes = Bike.query.filter_by().all()  # Fetch only the current user's bikes
+    bikes = Bike.query.filter_by(user_id=current_user.id).all()  # Fetch only the current user's bikes
     current_date = datetime.now(timezone.utc).date()
     return render_template("inventory.html", user=current_user, bikes=bikes)
 
 @views.route('/info')
 @login_required
 def info():
-    bikes = Bike.query.filter_by(Bike.out_of_commission == False).all()
+    bikes = Bike.query.filter_by(out_of_commission=False).all()
     current_date = datetime.now(timezone.utc).date()
     
     location_summary = {}
