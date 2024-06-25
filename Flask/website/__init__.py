@@ -13,6 +13,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'OutsideBrandsSecretKey1234'
     db_path = path.join(path.abspath('website'), DB_NAME)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('HEROKU_POSTGRESQL_URL', f'sqlite:///{db_path}')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     migrate.init_app(app, db)
 
