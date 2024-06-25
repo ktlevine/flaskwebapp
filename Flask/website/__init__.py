@@ -3,17 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path, makedirs
 from flask_login import LoginManager
 from flask_migrate import Migrate
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
-DB_NAME = "database.db"
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'OutsideBrandsSecretKey1234'
-    db_path = path.join(path.abspath('website'), DB_NAME)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('HEROKU_POSTGRESQL_URL', f'sqlite:///{db_path}')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Use DATABASE_URL environment variable for Heroku PostgreSQL
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db').replace('postgres://', 'postgresql://')
+
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -44,10 +45,6 @@ def create_app():
     return app
 
 def create_database(app):
-    db_path = path.join(path.abspath('website'), DB_NAME)
-    if not path.exists(db_path):
-        with app.app_context():
-            db.create_all()
-            print(f'Created Database at {db_path}')
-    else:
-        print(f"Database already exists at {db_path}")
+    with app.app_context():
+        db.create_all()
+        print('Database created')
