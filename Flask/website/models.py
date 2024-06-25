@@ -1,6 +1,6 @@
 from . import db
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timezone
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,7 +20,7 @@ class Bike(db.Model):
     needs_maintenance = db.Column(db.Boolean, nullable=False)
     out_of_commission = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date_entered = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_entered = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f'<Bike {self.number} - {self.type}>'
