@@ -48,7 +48,7 @@ def home():
 def inventory():
     bikes = Bike.query.all()  # Fetch all bikes
     current_date = datetime.now(timezone.utc).date()  # Ensure current date is in UTC
-    return render_template("inventory.html", user=current_user, bikes=bikes)
+    return render_template("inventory.html", bikes=bikes)
 
 @views.route('/info')
 @login_required
