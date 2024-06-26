@@ -28,8 +28,7 @@ def home():
             type=bike_type,
             location=bike_location,
             needs_maintenance=needs_maintenance,
-            user_id=current_user.id,
-            date_entered=datetime.now(timezone.utc)  # Ensure date is stored in UTC
+            user_id=current_user.id
         )
         try:
             db.session.add(new_bike)
@@ -41,14 +40,35 @@ def home():
         return redirect(url_for('views.home'))
 
     bikes = Bike.query.all()  # Fetch all bikes
-    return render_template("home.html", bikes=bikes)
+    return render_template("home.html", user=current_user, bikes=bikes)
 
 @views.route('/inventory')
 @login_required
 def inventory():
     bikes = Bike.query.all()  # Fetch all bikes
-    current_date = datetime.now(timezone.utc).date()  # Ensure current date is in UTC
-    return render_template("inventory.html", bikes=bikes)
+    current_date = datetime.now(timezone.utc).date()
+    
+    # Create a summary similar to the info page
+    bike_summary = {}
+    for bike in bikes:
+        location = bike.location
+        if location not in bike_summary:
+            bike_summary[location] = {'total': 0, 'types': {}, 'entered_today': 0, 'not_entered_today': 0, 'bikes': []}
+        
+        bike_summary[location]['total'] += 1
+        bike_summary[location]['bikes'].append(bike)
+        
+        bike_type = bike.type
+        if bike_type not in bike_summary[location]['types']:
+            bike_summary[location]['types'][bike_type] = 0
+        bike_summary[location]['types'][bike_type] += 1
+
+        if bike.date_entered.date() == current_date:
+            bike_summary[location]['entered_today'] += 1
+        else:
+            bike_summary[location]['not_entered_today'] += 1
+    
+    return render_template("inventory.html", user=current_user, bike_summary=bike_summary, current_date=current_date)
 
 @views.route('/info')
 @login_required
@@ -73,7 +93,7 @@ def info():
         else:
             location_summary[location]['not_entered_today'] += 1
     
-    return render_template("info.html", location_summary=location_summary)
+    return render_template("info.html", user=current_user, location_summary=location_summary)
 
 @views.route('/delete-bike', methods=['POST'])
 @login_required
