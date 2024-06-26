@@ -39,13 +39,13 @@ def home():
             flash(f'Error adding bike entry: {str(e)}', category='error')
         return redirect(url_for('views.home'))
 
-    bikes = Bike.query.filter_by(user_id=current_user.id).all()  # Fetch only the current user's bikes
+    bikes = Bike.query.all()  # Fetch all bikes
     return render_template("home.html", user=current_user, bikes=bikes)
 
 @views.route('/inventory')
 @login_required
 def inventory():
-    bikes = Bike.query.filter_by(user_id=current_user.id).all()  # Fetch only the current user's bikes
+    bikes = Bike.query.all()  # Fetch all bikes
     current_date = datetime.now(timezone.utc).date()
     return render_template("inventory.html", user=current_user, bikes=bikes)
 
@@ -110,7 +110,7 @@ def mark_out_of_commission():
 @login_required
 def export():
     # Fetch the data from the database
-    bikes = Bike.query.filter_by(user_id=current_user.id).all()
+    bikes = Bike.query.all()
 
     # Prepare the data for export
     data = []
