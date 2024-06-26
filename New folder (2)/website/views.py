@@ -41,7 +41,7 @@ def home():
         return redirect(url_for('views.home'))
 
     bikes = Bike.query.all()  # Fetch all bikes
-    return render_template("home.html", user=current_user, bikes=bikes)
+    return render_template("home.html", bikes=bikes)
 
 @views.route('/inventory')
 @login_required
