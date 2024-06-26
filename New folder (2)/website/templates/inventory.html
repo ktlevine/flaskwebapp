@@ -124,7 +124,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', (event) => {
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];  // Ensure this is in UTC
         const dateElements = document.querySelectorAll('.date-entered');
 
         dateElements.forEach(el => {
