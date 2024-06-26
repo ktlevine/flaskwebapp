@@ -31,6 +31,23 @@
             align-items: center;
             margin-bottom: 15px;
         }
+        .search-result {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .search-result h2 {
+            flex-basis: 100%;
+        }
+        .list-group-item {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        @media (min-width: 768px) {
+            .list-group-item {
+                flex-basis: calc(50% - 15px);
+                margin-right: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -44,20 +61,25 @@
     <!-- Search and Filter Bar -->
     <input class="form-control mb-3" id="searchBar" type="text" placeholder="Search by number, type, or location..." onkeyup="searchBikes()">
 
-    <ul class="list-group list-group-flush" id="bikes">
-        {% for bike in bikes %}
-        <li class="list-group-item {% if bike.out_of_commission %}out-of-commission{% endif %}">
-            <p>Number: {{ bike.number }}</p>
-            <p>Type: {{ bike.type }}</p>
-            <p>Location: {{ bike.location }}</p>
-            <p>Needs Maintenance: {{ 'Yes' if bike.needs_maintenance else 'No' }}</p>
-            <p>Out of Commission: {{ 'Yes' if bike.out_of_commission else 'No' }}</p>
-            <p class="date-entered {% if bike.date_entered.date() != current_date %}date-entered-wrong{% else %}date-entered-today{% endif %}" data-date="{{ bike.date_entered.date() }}">Date Entered: {{ bike.date_entered.date() }}</p>
-            <button class="btn btn-danger" onclick="deleteBike('{{ bike.id }}')">Delete</button>
-            <button class="btn btn-warning" onclick="markOutOfCommission('{{ bike.id }}')">Mark Out of Commission</button>
-        </li>
+    <div class="search-result">
+        {% for location, summary in bike_summary.items() %}
+            <h2>{{ location }}</h2>
+            <ul class="list-group list-group-flush">
+                {% for bike in summary.bikes %}
+                <li class="list-group-item {% if bike.out_of_commission %}out-of-commission{% endif %}">
+                    <p>Number: {{ bike.number }}</p>
+                    <p>Type: {{ bike.type }}</p>
+                    <p>Location: {{ bike.location }}</p>
+                    <p>Needs Maintenance: {{ 'Yes' if bike.needs_maintenance else 'No' }}</p>
+                    <p>Out of Commission: {{ 'Yes' if bike.out_of_commission else 'No' }}</p>
+                    <p class="date-entered {% if bike.date_entered.date() != current_date %}date-entered-wrong{% else %}date-entered-today{% endif %}" data-date="{{ bike.date_entered.date() }}">Date Entered: {{ bike.date_entered.date() }}</p>
+                    <button class="btn btn-danger" onclick="deleteBike('{{ bike.id }}')">Delete</button>
+                    <button class="btn btn-warning" onclick="markOutOfCommission('{{ bike.id }}')">Mark Out of Commission</button>
+                </li>
+                {% endfor %}
+            </ul>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 
 <script>
@@ -108,17 +130,17 @@
     function searchBikes() {
         const searchBar = document.getElementById('searchBar');
         const filter = searchBar.value.toLowerCase();
-        const bikesList = document.getElementById('bikes');
-        const bikes = bikesList.getElementsByTagName('li');
+        const searchResult = document.querySelector('.search-result');
+        const bikeItems = searchResult.getElementsByTagName('li');
 
-        for (let i = 0; i < bikes.length; i++) {
-            const bikeNumber = bikes[i].getElementsByTagName('p')[0].textContent.toLowerCase();
-            const bikeType = bikes[i].getElementsByTagName('p')[1].textContent.toLowerCase();
-            const bikeLocation = bikes[i].getElementsByTagName('p')[2].textContent.toLowerCase();
+        for (let i = 0; i < bikeItems.length; i++) {
+            const bikeNumber = bikeItems[i].querySelector('p:nth-of-type(1)').textContent.toLowerCase();
+            const bikeType = bikeItems[i].querySelector('p:nth-of-type(2)').textContent.toLowerCase();
+            const bikeLocation = bikeItems[i].querySelector('p:nth-of-type(3)').textContent.toLowerCase();
             if (bikeNumber.indexOf(filter) > -1 || bikeType.indexOf(filter) > -1 || bikeLocation.indexOf(filter) > -1) {
-                bikes[i].style.display = "";
+                bikeItems[i].style.display = "";
             } else {
-                bikes[i].style.display = "none";
+                bikeItems[i].style.display = "none";
             }
         }
     }
