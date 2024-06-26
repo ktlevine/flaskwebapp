@@ -28,7 +28,8 @@ def home():
             type=bike_type,
             location=bike_location,
             needs_maintenance=needs_maintenance,
-            user_id=current_user.id
+            user_id=current_user.id,
+            date_entered=datetime.now(timezone.utc)  # Ensure date is stored in UTC
         )
         try:
             db.session.add(new_bike)
@@ -46,7 +47,7 @@ def home():
 @login_required
 def inventory():
     bikes = Bike.query.all()  # Fetch all bikes
-    current_date = datetime.now(timezone.utc).date()
+    current_date = datetime.now(timezone.utc).date()  # Ensure current date is in UTC
     return render_template("inventory.html", user=current_user, bikes=bikes)
 
 @views.route('/info')
